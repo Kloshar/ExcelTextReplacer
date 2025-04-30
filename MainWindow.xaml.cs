@@ -31,7 +31,7 @@ namespace ExcelTextReplacer
 
             string? val = GetCellValue(path, "Плановая2", "B57");
 
-            Debug.WriteLine(val);
+            Debug.WriteLine(val); 
         }
     }
 }
