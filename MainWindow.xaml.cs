@@ -31,10 +31,10 @@ namespace ExcelTextReplacer
 
             InitializeComponent();
 
-            string path = @"93-24-2030_РКМ_Койда_1_безопасность.xlsx";
-            string txt = @"ИТОГО с НДС 0%";
+            string path = @"book.xlsx";
+            string txt = @"hello";
 
-            string? val = GetCellValue(path, "Плановая2", "B57");
+            string? val = GetCellValue(path, "Плановая2", "A1");
             bool res = CheckCellString(path, txt);
 
             Debug.WriteLine(res);
@@ -51,7 +51,9 @@ namespace ExcelTextReplacer
                     Sheet? sheet = wbPart?.Workbook.Descendants<Sheet>().Where(s => s.Name.Value.StartsWith(sheetName)).FirstOrDefault(); //поиск листа по имени
                     WorksheetPart wsPart = (WorksheetPart)wbPart!.GetPartById(sheet?.Id!); //часть листа
 
-                    Cell? cell = wsPart.Worksheet?.Descendants<Cell>()?.Where(c => c.CellReference == address).FirstOrDefault(); //поиск ячейки по адресу
+                    Debug.WriteLine(wsPart.RootElement);
+
+                    //Cell? cell = wsPart.Worksheet?.Descendants<Cell>()?.Where(c => c.CellReference == address).FirstOrDefault(); //поиск ячейки по адресу
 
 
                 }
