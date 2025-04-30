@@ -156,13 +156,6 @@ namespace ExcelTextReplacer
                     WorkbookPart? wbPart = excelDoc.WorkbookPart; //получаем часть
                     Sheets? sheets = wbPart?.Workbook.Sheets; //получаем страницы
                     Sheet? sheet = wbPart?.Workbook.Descendants<Sheet>().Where(s => s.Name.Value.StartsWith(sheetName)).FirstOrDefault(); //поиск листа по имени
-
-                    //foreach (Sheet s in sheets)
-                    //{
-                    //    Console.WriteLine($"{s.Name.Value}, {sheetName}, {s.Name.Value.StartsWith(sheetName)}");
-                    //}
-
-                    //Sheet? sheet = wbPart?.Workbook.Descendants<Sheet>().Where(s => s.Name == sheetName).FirstOrDefault(); //поиск листа по имени
                     WorksheetPart wsPart = (WorksheetPart)wbPart!.GetPartById(sheet?.Id!);
                     Cell? cell = wsPart.Worksheet?.Descendants<Cell>()?.Where(c => c.CellReference == address).FirstOrDefault(); //поиск ячейки по адресу
                     string? newValue = string.Empty; //для возвращаемого значения
