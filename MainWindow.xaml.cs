@@ -31,7 +31,18 @@ namespace ExcelTextReplacer
 
             string? val = GetCellValue(path, "Плановая2", "B57");
 
+            //сначала нужно сделать перебор ячеек на одной странице
+            //дальше попробовать замену
+            
+
             Debug.WriteLine(val); 
+        }
+        private void userWindow_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter || e.Key == Key.Space)
+            {
+                Close();
+            }
         }
     }
 }

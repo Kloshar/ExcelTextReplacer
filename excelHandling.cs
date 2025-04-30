@@ -147,7 +147,7 @@ namespace ExcelTextReplacer
             }
 
         } //end DelCellValue
-        static string? GetCellValue(string filepath, string sheetName, string address)
+        string? GetCellValue(string filepath, string sheetName, string address)
         {
             try
             {
@@ -239,6 +239,6 @@ namespace ExcelTextReplacer
                 //Console.WriteLine($"Строка: {oldValue}");
                 return oldValue; //если строка
             }
-        }
+        } //округление до двух знаков и отделение пробелом
     }
 }
