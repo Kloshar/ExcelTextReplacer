@@ -33,15 +33,13 @@ namespace ExcelTextReplacer
     public partial class MainWindow : Window
     {
         string path = @"93-24-2030_РКМ_Койда_1_безопасность.xlsx";
-
+        int counter = 0;
         public MainWindow()
         {
             InitializeComponent();
             
             string oldTxt = @"hello";
-            string newTxt = @"Good morning!";
-
-            int counter = 0;
+            string newTxt = @"Good morning!";            
 
             replaceWhat.Text = oldTxt;
             replaceWith.Text = newTxt;
@@ -77,6 +75,7 @@ namespace ExcelTextReplacer
 
                             Debug.WriteLine($"Заменяем {ssItem.InnerText} на {newTxt}");
                             ssItem.Text = new DocumentFormat.OpenXml.Spreadsheet.Text(newTxt);
+                            counter++;
                         }
                     }                    
                     excelDoc.Save();
@@ -99,6 +98,11 @@ namespace ExcelTextReplacer
         private void replaceBtn_Click(object sender, RoutedEventArgs e)
         {
             bool res = CheckCellString(path, replaceWhat.Text, replaceWith.Text);
+
+            if (res)
+            {
+                MessageBox.Show("Сделано замен: " + counter + "!");
+            }
         }
     }
 }
