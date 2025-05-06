@@ -1,0 +1,23 @@
+<x:sst xmlns:x="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="1" uniqueCount="1">
+	<x:si>
+		
+		<x:t>Good morning!</x:t>
+		
+		<x:r>
+			<x:t xml:space="preserve">
+				Цена продукции (без НДС)
+			</x:t>
+		</x:r>
+		
+		<x:r>
+			<x:rPr>
+				<x:sz val="11" />
+				<x:color theme="1" />
+				<x:rFont val="Times New Roman" />
+				<x:family val="1" />
+			</x:rPr>
+			<x:t>(сумма строк 1700, 1800)</x:t>
+		</x:r>
+		
+	</x:si>
+</x:sst>
