@@ -21,3 +21,22 @@
 		
 	</x:si>
 </x:sst>
+
+<x:sst count="1" uniqueCount="1" xmlns:x="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+	<x:si>
+		<x:r>
+			<x:t>abcd</x:t>
+		</x:r>
+		<x:r>
+			<x:rPr>
+				<x:b />
+				<x:sz val="11" />
+				<x:color theme="1" />
+				<x:rFont val="Times New Roman" />
+				<x:family val="1" />
+				<x:charset val="204" />
+			</x:rPr>
+			<x:t>abc</x:t>
+		</x:r>
+	</x:si>
+</x:sst>
