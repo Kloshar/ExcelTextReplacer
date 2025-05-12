@@ -19,6 +19,7 @@ using System.Xml;
 
 using Text = DocumentFormat.OpenXml.Spreadsheet.Text;
 using Run = DocumentFormat.OpenXml.Spreadsheet.Run;
+using System.Windows.Controls.Primitives;
 
 //https://learn.microsoft.com/ru-ru/office/open-xml/spreadsheet/overview
 
@@ -29,12 +30,8 @@ using Run = DocumentFormat.OpenXml.Spreadsheet.Run;
 3. замена части строки
 4. графический интерфейс
  */
-
 namespace ExcelTextReplacer
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         string path = @"book.xlsx";
@@ -42,118 +39,82 @@ namespace ExcelTextReplacer
         int index = 0; //курсор искомой строки
         int writed = 0; //записанные символы
         int counter = 0;
+        string oldTxt = "qwe";
+        string newTxt = @"ab";
+        bool usedUp = false;
         public MainWindow()
         {
             InitializeComponent();
 
-            string oldTxt = "xyzqwe";
-            string newTxt = @"ab";
-            
-
             replaceWhat.Text = oldTxt;
             replaceWith.Text = newTxt;
 
-            //string? val = GetCellValue(path, "Плановая2", "A1");
-            //bool res = CheckCellString(path, oldTxt, newTxt);
-            //bool res1 = CheckCellString(path, "Цена продукции (без НДС)", "helloo");
-            //Debug.WriteLine(res);
+            replaceBtn.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
         }
         bool CheckCellString(string filepath, string oldTxt, string newTxt)
         {
-            string sheetName = "Плановая2"; //пока ищем только на этом листе
             try
             {
                 using (SpreadsheetDocument excelDoc = SpreadsheetDocument.Open(filepath, true)) //открываем файл ecxel
                 {
-                    WorkbookPart? wbPart = excelDoc.WorkbookPart; //получаем часть
-                    //Sheets? sheets = wbPart?.Workbook.Sheets; //получаем страницы
-                    //Sheet? sheet = wbPart?.Workbook.Descendants<Sheet>().Where(s => s.Name.Value.StartsWith(sheetName)).FirstOrDefault(); //поиск листа по имени
-                    //WorksheetPart wsPart = (WorksheetPart)wbPart!.GetPartById(sheet?.Id!); //часть листа
-
-                    //далее получаем все узлы на листе
-                    SharedStringTablePart? ssPart = wbPart.SharedStringTablePart;
+                    WorkbookPart? wbPart = excelDoc.WorkbookPart; //получаем часть                    
+                    SharedStringTablePart? ssPart = wbPart.SharedStringTablePart; //далее получаем все узлы на листе
 
                     //Debug.WriteLine(ssPart.SharedStringTable.OuterXml);
 
                     foreach (SharedStringItem ssItem in ssPart.SharedStringTable) //перебираем строки (элементы) в таблице строк
                     {                        
-                        if (ssItem.InnerText == oldTxt) //если текст совпадает с искомой строкой
+                        if (ssItem.InnerText == oldTxt) //если текст всех блоков совпадает с искомой строкой
                         {
-                            string str = ssItem.InnerText;
-
-                            //Debug.WriteLine($"Заменяем {ssItem.InnerText} на {newTxt}");
-
-                            //если ssItem.InnerText (txt) совпдадает, то начинается поиск в узле
-                            //1. текст может быть без форматирования, тогда он просто в узле <x:t>. Требуется проверка совпадает ли он
-                            //2. текст с форматированием будет вложен в отдельных узлах <x:r>. Форматирование тоже, но его не трогаем
-                            //3. последовательно проходися по узлам <x:r><x:t></x:t></x:r> выискивая совпадения с искомым текстом
-
-                            foreach (DocumentFormat.OpenXml.OpenXmlElement el in ssItem) //проходим по элементам si
+                            for(int i = 0; i < ssItem.Count(); i++) //перебор блоков с кусками форматированного текста
                             {
-                                if (el is Text) //если это текст без форматирования
+                                DocumentFormat.OpenXml.OpenXmlElement el = ssItem.ChildElements[i]; //один из потомков
+
+                                Debug.WriteLine($"Работаем с элементом: {el.InnerXml}");
+
+                                Text? t = null;
+                                if (el is Text) t = (Text?)el; //если это текст без форматирования
+                                if (el is Run) t = el.Descendants<Text>().FirstOrDefault(); //если это прогон, получаем потомка типа текст
+
+                                if (usedUp == false) //если не все символы новой строки израсходованы
                                 {
-                                    string txt = ((Text)el).Text;
-
-                                    if (txt.Length == oldTxt.Length) //если все искомые символы в этом элементе
-                                    {
-                                        ((Text)el).Text = newTxt; //то просто заменяем текст в элементе на новую строку
-                                        counter++; //обновляем счётчик
-                                        return true; //и выходим из метода
-                                    }
-
-                                    if (txt.Length < oldTxt.Length) //если в элементе только часть искомых символов
-                                    {
-                                        index += txt.Length; //продвигаем индекс на количество заменяемых символов
-                                        ((Text)el).Text = newTxt.Substring(writed, index - writed); //то перезаписываем текст в элементе частью новой строки
-                                        writed += index; //сохраняем число записанных символов
-                                        //переходим к следующему элементу el
-                                    }
+                                    Debug.WriteLine($"Заменяем текст в элементе: {el.InnerXml}");
+                                    replaceTextInBlock(t);
                                 }
-                                if (el is Run)
+                                else
                                 {
-                                    Text? t = el.Descendants<Text>().FirstOrDefault();
-
-                                    string txt = ((Text)t).Text;
-
-                                    if (txt.Length == oldTxt.Length) //если все искомые символы в этом элементе
-                                    {
-                                        ((Text)t).Text = newTxt; //то просто заменяем текст в элементе на новую строку
-                                        counter++; //обновляем счётчик
-                                        return true; //и выходим из метода
-                                    }
-
-                                    //нужна проверка, что символы новой строки не израсходованы
-                                    //если кончились, то нужно удалить все элементы старой строки
-
-                                    if (txt.Length < oldTxt.Length) //если в элементе только часть искомых символов
-                                    {
-                                        if(txt.Length >= newTxt.Substring(writed).Length) //если осталось заменить больше, чем осталось в новой строке
-                                        {
-                                            Debug.WriteLine($"больше - {newTxt.Substring(writed).Length}");
-                                            index += newTxt.Substring(writed).Length; //или продвигаем на оставшееся количество символов
-                                            
-                                        }
-                                        else
-                                        {
-                                            Debug.WriteLine($"меньше - {newTxt.Substring(writed).Length}");
-                                            index += txt.Length; //продвигаем индекс на количество заменяемых символов
-                                        }                                           
-
-                                        string strPart = newTxt.Substring(writed, index - writed);
-
-                                        Debug.WriteLine($"{newTxt.Substring(writed, index - writed)}");
-
-                                        ((Text)t).Text = newTxt.Substring(writed, index - writed); //то перезаписываем текст в элементе частью новой строки
-                                        writed += index; //сохраняем число записанных символов
-                                        //переходим к следующему элементу el
-                                    }
+                                    Debug.WriteLine($"Удаляем элемент: {el.InnerXml}");
+                                    el.Remove();
+                                    i--;
                                 }
                             }
-
-                            //ssItem.Text = new DocumentFormat.OpenXml.Spreadsheet.Text(newTxt); //добавилось в начало...
                             counter++;
                         }
-                    }
+                        else if (ssItem.InnerText.Contains(oldTxt)) //если часть текста всех блоков совпадает с искомой строкой
+                        {
+                            string txt = ssItem.InnerText;
+                            int start = txt.IndexOf(oldTxt);
+
+                            //Debug.WriteLine(txt.Substring(3));
+
+                            for (int i = 0; i < ssItem.Count(); i++) //перебор блоков с кусками форматированного текста
+                            {
+                                DocumentFormat.OpenXml.OpenXmlElement el = ssItem.ChildElements[i]; //один из потомков
+
+                                Debug.WriteLine($"Работаем с элементом: {el.InnerXml}");
+
+                                Text? t = null;
+                                if (el is Text) t = (Text?)el; //если это текст без форматирования
+                                if (el is Run) t = el.Descendants<Text>().FirstOrDefault(); //если это прогон, получаем потомка типа текст
+
+                                
+                                //далее перебираем блоки до этого индекса...
+
+
+
+                            }
+                         }
+                     }
                     //excelDoc.Save(); //сохраняет документ excel, но таблица строк сохраняется сама
                 }
                 return true;
@@ -162,6 +123,26 @@ namespace ExcelTextReplacer
             {
                 Console.WriteLine(ex.Message);
                 return false;
+            }
+        }
+        void replaceTextInBlock(Text? t)
+        {  
+            string txt = t.Text;
+            if (txt.Length >= oldTxt.Length) //если все искомые символы в этом элементе
+            {
+                t.Text = newTxt; //то просто заменяем текст в элементе на новую строку
+                counter++; //обновляем счётчик
+            }
+            if (txt.Length < oldTxt.Length) //если в элементе только часть искомых символов
+            {
+                //если осталось заменить больше, чем осталось в новой строке, то продвигаем на оставшееся количество символов или продвигаем индекс на количество заменяемых символов
+                index += txt.Length >= newTxt.Substring(writed).Length ? newTxt.Substring(writed).Length : txt.Length;
+
+                //Debug.WriteLine($"{newTxt.Substring(writed, index - writed)}");
+
+                t.Text = newTxt.Substring(writed, index - writed); //то перезаписываем текст в элементе частью новой строки
+                writed += index; //сохраняем число записанных символов
+                if (writed >= newTxt.Length) usedUp = true; //если записаны все символы новой строки
             }
         }
         private void userWindow_KeyUp(object sender, KeyEventArgs e)
