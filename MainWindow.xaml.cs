@@ -39,8 +39,8 @@ namespace ExcelTextReplacer
         int index = 0; //курсор искомой строки
         int writed = 0; //записанные символы
         int counter = 0;
-        string oldTxt = "qwe";
-        string newTxt = @"ab";
+        string oldTxt = "q";
+        string newTxt = @"a";
         bool usedUp = false;
         public MainWindow()
         {
@@ -84,37 +84,49 @@ namespace ExcelTextReplacer
                                 else
                                 {
                                     Debug.WriteLine($"Удаляем элемент: {el.InnerXml}");
-                                    el.Remove();
+                                    el.Remove(); //удаляем оставшиеся блоки с текстом и форматированием
                                     i--;
                                 }
                             }
-                            counter++;
-                        }
+                        }//если текст всех блоков совпадает с искомой строкой
                         else if (ssItem.InnerText.Contains(oldTxt)) //если часть текста всех блоков совпадает с искомой строкой
                         {
                             string txt = ssItem.InnerText;
-                            int start = txt.IndexOf(oldTxt);
-
-                            //Debug.WriteLine(txt.Substring(3));
+                            int start = txt.IndexOf(oldTxt); //start = 3
 
                             for (int i = 0; i < ssItem.Count(); i++) //перебор блоков с кусками форматированного текста
                             {
                                 DocumentFormat.OpenXml.OpenXmlElement el = ssItem.ChildElements[i]; //один из потомков
 
-                                Debug.WriteLine($"Работаем с элементом: {el.InnerXml}");
+                                //Debug.WriteLine($"Работаем с элементом: {el.InnerXml}");
 
                                 Text? t = null;
                                 if (el is Text) t = (Text?)el; //если это текст без форматирования
                                 if (el is Run) t = el.Descendants<Text>().FirstOrDefault(); //если это прогон, получаем потомка типа текст
-
                                 
-                                //далее перебираем блоки до этого индекса...
-
-
-
+                                for (int j = 0; j < t.Text.Length; j++) //далее перебираем символы пока индекс не уменьшится до нуля
+                                {
+                                    if(start > 0) //если перебрали меньше символов, чем было в искомой строке
+                                    {
+                                        start--; //то уменьшаем на один
+                                        //Debug.WriteLine($"Обрабатывается символ: {t.Text[j]}, start = {start}"); //xyzqwe
+                                    }
+                                    else
+                                    {
+                                        if (usedUp == false) //если не все символы новой строки израсходованы
+                                        {
+                                            Debug.WriteLine($"Заменяем текст в элементе: {el.InnerXml}");
+                                            replaceTextInBlock(t);
+                                        }
+                                        else
+                                        {
+                                            //в этом варианте не удаляем оставшиеся блоки с текстом
+                                        }
+                                    }
+                                }
                             }
-                         }
-                     }
+                        }//если часть текста всех блоков совпадает с искомой строкой
+                    }
                     //excelDoc.Save(); //сохраняет документ excel, но таблица строк сохраняется сама
                 }
                 return true;
@@ -131,10 +143,14 @@ namespace ExcelTextReplacer
             if (txt.Length >= oldTxt.Length) //если все искомые символы в этом элементе
             {
                 t.Text = newTxt; //то просто заменяем текст в элементе на новую строку
-                counter++; //обновляем счётчик
+                index += txt.Length;
+                writed += index; //сохраняем число записанных символов
+                if (writed >= newTxt.Length) usedUp = true; //если записаны все символы новой строки
             }
             if (txt.Length < oldTxt.Length) //если в элементе только часть искомых символов
             {
+                Debug.WriteLine($"index = {index}"); //q.Length < qwe.Length
+
                 //если осталось заменить больше, чем осталось в новой строке, то продвигаем на оставшееся количество символов или продвигаем индекс на количество заменяемых символов
                 index += txt.Length >= newTxt.Substring(writed).Length ? newTxt.Substring(writed).Length : txt.Length;
 
@@ -144,6 +160,7 @@ namespace ExcelTextReplacer
                 writed += index; //сохраняем число записанных символов
                 if (writed >= newTxt.Length) usedUp = true; //если записаны все символы новой строки
             }
+            counter++; //обновляем счётчик
         }
         private void userWindow_KeyUp(object sender, KeyEventArgs e)
         {
