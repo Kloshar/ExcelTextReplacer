@@ -39,9 +39,10 @@ namespace ExcelTextReplacer
         int index = 0; //курсор искомой строки
         int writed = 0; //записанные символы
         int counter = 0;
-        string oldTxt = "q";
-        string newTxt = @"a";
+        string oldTxt = "qw";
+        string newTxt = "r";
         bool usedUp = false;
+        int option = 1;
         public MainWindow()
         {
             InitializeComponent();
@@ -49,9 +50,9 @@ namespace ExcelTextReplacer
             replaceWhat.Text = oldTxt;
             replaceWith.Text = newTxt;
 
-            replaceBtn.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
+            //replaceBtn.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent)); //автоматическое нажатие кнопки начала замены
         }
-        bool CheckCellString(string filepath, string oldTxt, string newTxt)
+        bool CheckCellString(string filepath, string oldTxt, string newTxt, int option)
         {
             try
             {
@@ -64,7 +65,7 @@ namespace ExcelTextReplacer
 
                     foreach (SharedStringItem ssItem in ssPart.SharedStringTable) //перебираем строки (элементы) в таблице строк
                     {                        
-                        if (ssItem.InnerText == oldTxt) //если текст всех блоков совпадает с искомой строкой
+                        if (ssItem.InnerText == oldTxt && option == 1) //если текст всех блоков совпадает с искомой строкой
                         {
                             for(int i = 0; i < ssItem.Count(); i++) //перебор блоков с кусками форматированного текста
                             {
@@ -89,7 +90,7 @@ namespace ExcelTextReplacer
                                 }
                             }
                         }//если текст всех блоков совпадает с искомой строкой
-                        else if (ssItem.InnerText.Contains(oldTxt)) //если часть текста всех блоков совпадает с искомой строкой
+                        if (ssItem.InnerText.Contains(oldTxt) && option == 2) //если часть текста всех блоков совпадает с искомой строкой
                         {
                             string txt = ssItem.InnerText;
                             int start = txt.IndexOf(oldTxt); //start = 3
@@ -178,7 +179,13 @@ namespace ExcelTextReplacer
         }
         private void replaceBtn_Click(object sender, RoutedEventArgs e)
         {
-            bool res = CheckCellString(path, replaceWhat.Text, replaceWith.Text);
+            oldTxt = replaceWhat.Text;
+            newTxt = replaceWith.Text;
+
+            option = (bool)optionsBtn01.IsChecked ? 1 : 2;
+            option = (bool)optionsBtn02.IsChecked ? 2 : 1;
+
+            bool res = CheckCellString(path, replaceWhat.Text, replaceWith.Text, option);
 
             if (res)
             {
