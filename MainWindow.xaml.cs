@@ -37,7 +37,8 @@ namespace ExcelTextReplacer
         string path = @"book.xlsx";
         //string path = @"93-24-2030_РКМ_Койда_1_безопасность.xlsx";
         int index = 0; //курсор искомой строки
-        int writed = 0; //записанные символы
+        int writed = 0; //посчёт записанных символов (новых)
+        int substituted = 0; //подсчёт замешённых символов (старых)
         int counter = 0;
         string oldTxt = "qw";
         string newTxt = "r";
@@ -144,9 +145,10 @@ namespace ExcelTextReplacer
             if (txt.Length >= oldTxt.Length) //если все искомые символы в этом элементе
             {
                 t.Text = newTxt; //то просто заменяем текст в элементе на новую строку
-                index += txt.Length;
+                index += txt.Length; //продвигаем индекс на количество символов в элементе
                 writed += index; //сохраняем число записанных символов
                 if (writed >= newTxt.Length) usedUp = true; //если записаны все символы новой строки
+                substituted += txt.Length; //сколько символов перезаписано
             }
             if (txt.Length < oldTxt.Length) //если в элементе только часть искомых символов
             {
