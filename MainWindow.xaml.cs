@@ -51,7 +51,7 @@ namespace ExcelTextReplacer
             replaceWhat.Text = oldTxt;
             replaceWith.Text = newTxt;
 
-            //replaceBtn.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent)); //автоматическое нажатие кнопки начала замены
+            replaceBtn.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent)); //автоматическое нажатие кнопки начала замены
         }
         bool CheckCellString(string filepath, string oldTxt, string newTxt, int option)
         {
@@ -144,24 +144,26 @@ namespace ExcelTextReplacer
             string txt = t.Text;
             if (txt.Length >= oldTxt.Length) //если все искомые символы в этом элементе
             {
+                Debug.WriteLine($"Все искомые символы с этом теге!");
                 t.Text = newTxt; //то просто заменяем текст в элементе на новую строку
                 index += txt.Length; //продвигаем индекс на количество символов в элементе
                 writed += index; //сохраняем число записанных символов
                 if (writed >= newTxt.Length) usedUp = true; //если записаны все символы новой строки
                 substituted += txt.Length; //сколько символов перезаписано
             }
-            if (txt.Length < oldTxt.Length) //если в элементе только часть искомых символов
+            if (txt.Length < oldTxt.Length) //если в элементе только часть искомых символов //q.Length < r.Length
             {
-                Debug.WriteLine($"index = {index}"); //q.Length < qwe.Length
+                Debug.WriteLine($"index = {index}");
 
-                //если осталось заменить больше, чем осталось в новой строке, то продвигаем на оставшееся количество символов или продвигаем индекс на количество заменяемых символов
-                index += txt.Length >= newTxt.Substring(writed).Length ? newTxt.Substring(writed).Length : txt.Length;
+                //если осталось заменить больше или равное, чем осталось в новой строке, то продвигаем на оставшееся количество символов или продвигаем индекс на количество заменяемых символов
+                index += txt.Length >= newTxt.Substring(writed).Length ? newTxt.Substring(writed).Length : txt.Length; //
 
                 //Debug.WriteLine($"{newTxt.Substring(writed, index - writed)}");
 
                 t.Text = newTxt.Substring(writed, index - writed); //то перезаписываем текст в элементе частью новой строки
                 writed += index; //сохраняем число записанных символов
                 if (writed >= newTxt.Length) usedUp = true; //если записаны все символы новой строки
+                //substituted += 
             }
             counter++; //обновляем счётчик
         }
@@ -194,6 +196,7 @@ namespace ExcelTextReplacer
                 Debug.WriteLine("Сделано замен: " + counter + "!");
                 //MessageBox.Show("Сделано замен: " + counter + "!");
             }
+            File.Copy("bookOld.xlsx", "book.xlsx", true);
         }
     }
 }
