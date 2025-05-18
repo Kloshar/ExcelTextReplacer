@@ -40,8 +40,8 @@ namespace ExcelTextReplacer
         int writed = 0; //посчёт записанных символов (новых)
         
         int counter = 0;
-        string oldTxt = "qw";
-        string newTxt = "r";
+        string oldTxt = "cd";
+        string newTxt = "random";
         bool usedUp = false;
         int option = 1;
         public MainWindow()
@@ -51,7 +51,7 @@ namespace ExcelTextReplacer
             replaceWhat.Text = oldTxt;
             replaceWith.Text = newTxt;
 
-            replaceBtn.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent)); //автоматическое нажатие кнопки начала замены
+            //replaceBtn.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent)); //автоматическое нажатие кнопки начала замены
         }
         bool CheckCellString(string filepath, string oldTxt, string newTxt, int option)
         {
@@ -62,7 +62,7 @@ namespace ExcelTextReplacer
                     WorkbookPart? wbPart = excelDoc.WorkbookPart; //получаем часть                    
                     SharedStringTablePart? ssPart = wbPart.SharedStringTablePart; //далее получаем все узлы на листе
 
-                    //Debug.WriteLine(ssPart.SharedStringTable.OuterXml);
+                    Debug.WriteLine(ssPart.SharedStringTable.OuterXml);
 
                     foreach (SharedStringItem ssItem in ssPart.SharedStringTable) //перебираем строки (элементы) в таблице строк
                     {                        
@@ -153,14 +153,24 @@ namespace ExcelTextReplacer
         {  
             string txt = t.Text;
             int substituted = 0; //подсчёт замешённых символов (старых)
-            if (txt.Length >= oldTxt.Length) //если все искомые символы в этом элементе
+            if (txt.Contains(oldTxt)) //если все искомые символы в этом элементе
             {
                 Debug.WriteLine($"Все искомые символы с этом теге!");
-                t.Text = newTxt; //то просто заменяем текст в элементе на новую строку
-                index += txt.Length; //продвигаем индекс на количество символов в элементе
-                writed += index; //сохраняем число записанных символов
-                if (writed >= newTxt.Length) usedUp = true; //если записаны все символы новой строки
-                substituted += txt.Length; //сколько символов перезаписано
+
+                Debug.WriteLine($"{txt.Contains(oldTxt)}");
+
+                //здесь косяк...
+                //1. не корректная проверка, надо indexof()
+                //2. надо заменять посимвольно... или через string.replace()
+
+                t.Text = txt.Replace(oldTxt, newTxt); //заменяем старый текст на новый
+                writed = newTxt.Length;
+                usedUp = true; //записаны все символы новой строки
+
+                //тут нужно рассмотреть все варианты
+
+
+
             }
             else //если в элементе только часть искомых символов //q.Length < r.Length
             {
@@ -171,7 +181,7 @@ namespace ExcelTextReplacer
 
                 //Debug.WriteLine($"{newTxt.Substring(writed, index - writed)}");
 
-                //substituted += newTxt.Substring(writed, index - writed).Length; //количество перезаписанных  имволов в блоке
+                //substituted += newTxt.Substring(writed, index - writed).Length; //количество перезаписанных  символов в блоке
                 //Debug.WriteLine($"substituted = {substituted}");
 
                 t.Text = newTxt.Substring(writed, index - writed); //то перезаписываем текст в элементе частью новой строки
@@ -197,6 +207,8 @@ namespace ExcelTextReplacer
         }
         private void replaceBtn_Click(object sender, RoutedEventArgs e)
         {
+            File.Copy("bookOld.xlsx", "book.xlsx", true);
+
             oldTxt = replaceWhat.Text;
             newTxt = replaceWith.Text;
 
