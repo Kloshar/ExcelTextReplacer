@@ -38,7 +38,7 @@ namespace ExcelTextReplacer
         //string path = @"93-24-2030_РКМ_Койда_1_безопасность.xlsx";
         int index = 0; //курсор искомой строки
         int writed = 0; //посчёт записанных символов (новых)
-        int substituted = 0; //подсчёт замешённых символов (старых)
+        
         int counter = 0;
         string oldTxt = "qw";
         string newTxt = "r";
@@ -91,6 +91,7 @@ namespace ExcelTextReplacer
                                 }
                             }
                         }//если текст всех блоков совпадает с искомой строкой
+
                         if (ssItem.InnerText.Contains(oldTxt) && option == 2) //если часть текста всех блоков совпадает с искомой строкой
                         {
                             string txt = ssItem.InnerText;
@@ -100,7 +101,7 @@ namespace ExcelTextReplacer
                             {
                                 DocumentFormat.OpenXml.OpenXmlElement el = ssItem.ChildElements[i]; //один из потомков
 
-                                //Debug.WriteLine($"Работаем с элементом: {el.InnerXml}");
+                                Debug.WriteLine($"Работаем с элементом: {el.InnerXml}");
 
                                 Text? t = null;
                                 if (el is Text) t = (Text?)el; //если это текст без форматирования
@@ -120,13 +121,22 @@ namespace ExcelTextReplacer
                                             Debug.WriteLine($"Заменяем текст в элементе: {el.InnerXml}");
                                             replaceTextInBlock(t);
                                         }
-                                        else
+                                        else //если символы новой строки израсходованы
                                         {
-                                            //в этом варианте не удаляем оставшиеся блоки с текстом
+                                            Debug.WriteLine($"writed = {writed}, oldTxt.Length = {oldTxt.Length}");
+
+                                            if (writed < oldTxt.Length) //но записано меньше, чем искали
+                                            {
+                                                //здесь нужно удалять нужное количество символов пока сравняем writed с oldTxt.Length
+                                                t.Text = t.Text.Substring(1);
+                                                Debug.WriteLine($"t={t.Text}");
+
+
+                                            }
                                         }
                                     }
-                                }
-                            }
+                                } //перебор символов 
+                            } //перебор блоков с кусками форматированного текстая
                         }//если часть текста всех блоков совпадает с искомой строкой
                     }
                     //excelDoc.Save(); //сохраняет документ excel, но таблица строк сохраняется сама
@@ -142,6 +152,7 @@ namespace ExcelTextReplacer
         void replaceTextInBlock(Text? t)
         {  
             string txt = t.Text;
+            int substituted = 0; //подсчёт замешённых символов (старых)
             if (txt.Length >= oldTxt.Length) //если все искомые символы в этом элементе
             {
                 Debug.WriteLine($"Все искомые символы с этом теге!");
@@ -151,19 +162,22 @@ namespace ExcelTextReplacer
                 if (writed >= newTxt.Length) usedUp = true; //если записаны все символы новой строки
                 substituted += txt.Length; //сколько символов перезаписано
             }
-            if (txt.Length < oldTxt.Length) //если в элементе только часть искомых символов //q.Length < r.Length
+            else //если в элементе только часть искомых символов //q.Length < r.Length
             {
-                Debug.WriteLine($"index = {index}");
+                //Debug.WriteLine($"index = {index}");
 
                 //если осталось заменить больше или равное, чем осталось в новой строке, то продвигаем на оставшееся количество символов или продвигаем индекс на количество заменяемых символов
-                index += txt.Length >= newTxt.Substring(writed).Length ? newTxt.Substring(writed).Length : txt.Length; //
+                index += txt.Length >= newTxt.Substring(writed).Length ? newTxt.Substring(writed).Length : txt.Length; //q.length >= r.substring(0).length
 
                 //Debug.WriteLine($"{newTxt.Substring(writed, index - writed)}");
 
+                //substituted += newTxt.Substring(writed, index - writed).Length; //количество перезаписанных  имволов в блоке
+                //Debug.WriteLine($"substituted = {substituted}");
+
                 t.Text = newTxt.Substring(writed, index - writed); //то перезаписываем текст в элементе частью новой строки
+
                 writed += index; //сохраняем число записанных символов
-                if (writed >= newTxt.Length) usedUp = true; //если записаны все символы новой строки
-                //substituted += 
+                if (writed >= newTxt.Length) usedUp = true; //если записаны все символы новой строки                              
             }
             counter++; //обновляем счётчик
         }
@@ -196,7 +210,7 @@ namespace ExcelTextReplacer
                 Debug.WriteLine("Сделано замен: " + counter + "!");
                 //MessageBox.Show("Сделано замен: " + counter + "!");
             }
-            File.Copy("bookOld.xlsx", "book.xlsx", true);
+            //File.Copy("bookOld.xlsx", "book.xlsx", true);
         }
     }
 }
