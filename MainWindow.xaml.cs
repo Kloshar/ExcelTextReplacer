@@ -43,8 +43,7 @@ namespace ExcelTextReplacer
         int counter = 0;
         string oldTxt = "bc";
         string newTxt = "new";
-        bool usedUp = false;
-        int option = 1;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -68,7 +67,7 @@ namespace ExcelTextReplacer
 
                     foreach (SharedStringItem siItem in ssPart.SharedStringTable) //перебираем строки в таблице строк
                     {
-                        if (siItem.InnerText.Contains(oldTxt) && option == 2) //если часть текста элемента si совпадает с искомой строкой
+                        if (siItem.InnerText.Contains(oldTxt)) //если часть текста элемента si совпадает с искомой строкой
                         {
                             string txt = siItem.InnerText; //записываем текст из строки
                             int start = txt.IndexOf(oldTxt); //получаем индекс начала найденной строки
@@ -121,10 +120,10 @@ namespace ExcelTextReplacer
                                     }
                                 } //перебор символов 
                             } //перебор блоков с кусками форматированного текстая
-                            Debug.WriteLine(siItem.InnerText);
+                            Debug.WriteLine($"Новая строка si: {siItem.InnerText}");
                         }//если часть текста всех блоков совпадает с искомой строкой
                     }
-                    //excelDoc.Save(); //сохраняет документ excel, но таблица строк сохраняется сама
+                    excelDoc.Save(); //сохраняет документ excel, но таблица строк сохраняется сама
                 }
             }
             catch (FileNotFoundException ex)
