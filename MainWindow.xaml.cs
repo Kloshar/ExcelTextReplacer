@@ -131,157 +131,8 @@ namespace ExcelTextReplacer
             {
                 Console.WriteLine(ex.Message);
             }
-        }
-        bool CheckCellString(string filepath, string oldTxt, string newTxt, int option)
-        {
-            try
-            {
-                using (SpreadsheetDocument excelDoc = SpreadsheetDocument.Open(filepath, true)) //открываем файл ecxel
-                {
-                    WorkbookPart? wbPart = excelDoc.WorkbookPart; //получаем часть
-                    SharedStringTablePart? ssPart = wbPart.SharedStringTablePart; //далее получаем все узлы на листе
+        }        
 
-                    Debug.WriteLine(ssPart.SharedStringTable.OuterXml);
-
-                    foreach (SharedStringItem siItem in ssPart.SharedStringTable) //перебираем строки (элементы) в таблице строк
-                    {
-                        if (siItem.InnerText == oldTxt && option == 1) //если текст всех блоков совпадает с искомой строкой
-                        {
-                            for (int i = 0; i < siItem.Count(); i++) //перебор блоков с кусками форматированного текста
-                            {
-                                DocumentFormat.OpenXml.OpenXmlElement el = siItem.ChildElements[i]; //один из потомков
-
-                                Debug.WriteLine($"Работаем с элементом: {el.InnerXml}");
-
-                                Text? t = null;
-                                if (el is Text) t = (Text?)el; //если это текст без форматирования
-                                if (el is Run) t = el.Descendants<Text>().FirstOrDefault(); //если это прогон, получаем потомка типа текст
-
-                                if (usedUp == false) //если не все символы новой строки израсходованы
-                                {
-                                    Debug.WriteLine($"Заменяем текст в элементе: {el.InnerXml}");
-                                    replaceTextInBlock(t);
-                                }
-                                else
-                                {
-                                    Debug.WriteLine($"Удаляем элемент: {el.InnerXml}");
-                                    el.Remove(); //удаляем оставшиеся блоки с текстом и форматированием
-                                    i--;
-                                }
-                            }
-                        }//если текст всех блоков совпадает с искомой строкой
-
-                        if (siItem.InnerText.Contains(oldTxt) && option == 2) //если часть текста всех блоков совпадает с искомой строкой
-                        {
-                            string txt = siItem.InnerText;
-                            int start = txt.IndexOf(oldTxt); //start = 3
-
-                            for (int i = 0; i < siItem.Count(); i++) //перебор блоков с кусками форматированного текста
-                            {
-                                DocumentFormat.OpenXml.OpenXmlElement el = siItem.ChildElements[i]; //один из потомков
-
-                                Debug.WriteLine($"Работаем с элементом: {el.InnerXml}");
-
-                                Text? t = null;
-                                if (el is Text) t = (Text?)el; //если это текст без форматирования
-                                if (el is Run) t = el.Descendants<Text>().FirstOrDefault(); //если это прогон, получаем потомка типа текст
-
-                                for (int j = 0; j < t.Text.Length; j++) //далее перебираем символы пока индекс не уменьшится до нуля
-                                {
-                                    if (start > 0) //если перебрали меньше символов, чем было в искомой строке
-                                    {
-                                        start--; //то уменьшаем на один
-                                        //Debug.WriteLine($"Обрабатывается символ: {t.Text[j]}, start = {start}"); //xyzqwe
-                                    }
-                                    else
-                                    {
-                                        if (usedUp == false) //если не все символы новой строки израсходованы
-                                        {
-                                            Debug.WriteLine($"Заменяем текст в элементе: {el.InnerXml}");
-                                            replaceTextInBlock(t);
-                                        }
-                                        else //если символы новой строки израсходованы
-                                        {
-                                            Debug.WriteLine($"writed = {writed}, oldTxt.Length = {oldTxt.Length}");
-
-                                            if (writed < oldTxt.Length) //но записано меньше, чем искали
-                                            {
-                                                //здесь нужно удалять нужное количество символов пока сравняем writed с oldTxt.Length
-                                                t.Text = t.Text.Substring(1);
-                                                Debug.WriteLine($"t={t.Text}");
-
-
-                                            }
-                                        }
-                                    }
-                                } //перебор символов 
-                            } //перебор блоков с кусками форматированного текстая
-                        }//если часть текста всех блоков совпадает с искомой строкой
-                    }
-                    //excelDoc.Save(); //сохраняет документ excel, но таблица строк сохраняется сама
-                }
-                return true;
-            }
-            catch (FileNotFoundException ex)
-            {
-                Console.WriteLine(ex.Message);
-                return false;
-            }
-        }
-        void replaceTextInBlock(Text? t)
-        {
-            string txt = t.Text;
-            int substituted = 0; //подсчёт замешённых символов (старых)
-            if (txt.Contains(oldTxt)) //если все искомые символы в этом элементе
-            {
-                Debug.WriteLine($"Все искомые символы с этом теге!");
-
-                Debug.WriteLine($"{txt.Contains(oldTxt)}");
-
-                //здесь косяк...
-                //1. не корректная проверка, надо indexof()
-                //2. надо заменять посимвольно... или через string.replace()
-
-                t.Text = txt.Replace(oldTxt, newTxt); //заменяем старый текст на новый
-                writed = newTxt.Length;
-                usedUp = true; //записаны все символы новой строки
-
-                //тут нужно рассмотреть все варианты
-
-            }
-            else //если в элементе только часть искомых символов //q.Length < r.Length
-            {
-                //Debug.WriteLine($"index = {index}");
-
-                //если осталось заменить больше или равное, чем осталось в новой строке, то продвигаем на оставшееся количество символов или продвигаем индекс на количество заменяемых символов
-                index += txt.Length >= newTxt.Substring(writed).Length ? newTxt.Substring(writed).Length : txt.Length; //q.length >= r.substring(0).length
-
-                //Debug.WriteLine($"{newTxt.Substring(writed, index - writed)}");
-
-                //substituted += newTxt.Substring(writed, index - writed).Length; //количество перезаписанных  символов в блоке
-                //Debug.WriteLine($"substituted = {substituted}");
-
-                t.Text = newTxt.Substring(writed, index - writed); //то перезаписываем текст в элементе частью новой строки
-
-                writed += index; //сохраняем число записанных символов
-                if (writed >= newTxt.Length) usedUp = true; //если записаны все символы новой строки                              
-            }
-            counter++; //обновляем счётчик
-        }
-        private void userWindow_KeyUp(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Enter || e.Key == Key.Space)
-            {
-                Close();
-            }
-        }
-        private void replaceBtn_KeyUp(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Enter || e.Key == Key.Space)
-            {
-                Close();
-            }
-        }
         private void replaceBtn_Click(object sender, RoutedEventArgs e)
         {
             File.Copy("bookOld.xlsx", "book.xlsx", true);
@@ -289,20 +140,13 @@ namespace ExcelTextReplacer
             oldTxt = replaceWhat.Text;
             newTxt = replaceWith.Text;
 
-            option = (bool)optionsBtn01.IsChecked ? 1 : 2;
-            option = (bool)optionsBtn02.IsChecked ? 2 : 1;
-
-
             StartWorking(path, oldTxt, newTxt);
-
-            //bool res = CheckCellString(path, replaceWhat.Text, replaceWith.Text, option);
 
             //if (res)
             //{
             //    Debug.WriteLine("Сделано замен: " + counter + "!");
             //    MessageBox.Show("Сделано замен: " + counter + "!");
             //}
-            //File.Copy("bookOld.xlsx", "book.xlsx", true);
         }
     }
 }

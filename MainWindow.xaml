@@ -5,21 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ExcelTextReplacer"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800" KeyUp="userWindow_KeyUp">
+        Title="MainWindow" Height="450" Width="800">
     <Grid>
         <StackPanel Orientation="Vertical">
             <Label>Что заменить</Label>
             <TextBox x:Name="replaceWhat" TextWrapping="Wrap" AcceptsReturn="True" Height="50"/>
             <Label>Чем заменить</Label>
             <TextBox x:Name="replaceWith" TextWrapping="Wrap" AcceptsReturn="True" Height="50"/>
-            <GroupBox Height="100" Header="Опции">
-                <StackPanel>
-                    <RadioButton x:Name="optionsBtn01" GroupName="options" Content="Замена всего текста в ячейке на новую строку" />
-                    <RadioButton x:Name="optionsBtn02" GroupName="options" Content="Замена части текста в ячейке на новую строку" IsChecked="True"/>
-                </StackPanel>
-            </GroupBox>
             <Separator Height="20" Foreground="{x:Null}" Background="White"/>
-            <Button x:Name="replaceBtn" Width="100" Click="replaceBtn_Click" KeyUp="replaceBtn_KeyUp">Заменить</Button>
+            <Button x:Name="replaceBtn" Width="100" Click="replaceBtn_Click">Заменить</Button>
             
         </StackPanel>
 
