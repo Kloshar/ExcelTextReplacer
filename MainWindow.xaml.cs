@@ -21,15 +21,7 @@ using Text = DocumentFormat.OpenXml.Spreadsheet.Text;
 using Run = DocumentFormat.OpenXml.Spreadsheet.Run;
 
 //https://learn.microsoft.com/ru-ru/office/open-xml/spreadsheet/overview
-
-/*
- Возможные проблемы:
-1. двойные кавычки нужно экранировать
-2. строки с переносом
-3. замена части строки
-4. графический интерфейс
- */
-
+//git@github.com:Kloshar/ExcelTextReplacer.git
 namespace ExcelTextReplacer
 {
     /// <summary>
