@@ -16,7 +16,7 @@ using DocumentFormat.OpenXml.Drawing.Charts;
 namespace ExcelTextReplacer
 {
     public partial class MainWindow : Window
-    {
+    { 
         string path = @"book.xlsx";
         //string path = @"93-24-2030_РКМ_Койда_1_безопасность.xlsx";
         int counter = 0;
