@@ -7,17 +7,21 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="30"/>
+        </Grid.RowDefinitions>
         <StackPanel Orientation="Vertical">
             <Label>Что заменить</Label>
             <TextBox x:Name="replaceWhat" TextWrapping="Wrap" AcceptsReturn="True" Height="50"/>
             <Label>Чем заменить</Label>
             <TextBox x:Name="replaceWith" TextWrapping="Wrap" AcceptsReturn="True" Height="50"/>
             <Separator Height="20" Foreground="{x:Null}" Background="White"/>
-            <Button x:Name="replaceBtn" Width="100" Click="replaceBtn_Click">Заменить</Button>
-            
+            <Button x:Name="replaceBtn" Width="100" Click="replaceBtn_Click">Заменить</Button>            
         </StackPanel>
-
-        
+        <ProgressBar x:Name="progress" Grid.Row="1" >
+            
+        </ProgressBar>       
 
     </Grid>
 </Window>
