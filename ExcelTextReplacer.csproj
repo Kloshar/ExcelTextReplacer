@@ -6,10 +6,26 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+    <PackageIcon>excelReplacer01.png</PackageIcon>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="excelReplacer01.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="DocumentFormat.OpenXml" Version="3.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="excelReplacer01.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="icon\excelReplacer01.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>
