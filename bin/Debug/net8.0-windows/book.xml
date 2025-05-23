@@ -1,0 +1,6 @@
+<x:dimension ref="A1:B2" xmlns:x="http://schemas.openxmlformats.org/spreadsheetml/2006/main" />
+<x:sheetViews xmlns:x="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><x:sheetView tabSelected="1" workbookViewId="0">
+<x:selection activeCell="B2" sqref="B2" /></x:sheetView></x:sheetViews>
+<x:sheetFormatPr defaultRowHeight="15" x14ac:dyDescent="0.25" xmlns:x14ac="http://schemas.microsoft.com/office/spreadsheetml/2009/9/ac" xmlns:x="http://schemas.openxmlformats.org/spreadsheetml/2006/main" />
+<x:sheetData xmlns:x="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+<x:row r="1" spans="1:2" x14ac:dyDescent="0.25" xmlns:x14ac="http://schemas.microsoft.com/office/spreadsheetml/2009/9/ac"><x:c r="A1" t="s"><x:v>0</x:v></x:c></x:row><x:row r="2" spans="1:2" x14ac:dyDescent="0.25" xmlns:x14ac="http://schemas.microsoft.com/office/spreadsheetml/2009/9/ac"><x:c r="B2" t="s"><x:v>1</x:v></x:c></x:row></x:sheetData><x:pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3" xmlns:x="http://schemas.openxmlformats.org/spreadsheetml/2006/main" />
