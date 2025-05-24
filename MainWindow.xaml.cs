@@ -49,6 +49,7 @@ namespace ExcelTextReplacer
             //bool res = CheckCellString(path, oldTxt, newTxt);
             //bool res1 = CheckCellString(path, "Цена продукции (без НДС)", "helloo");
             //Debug.WriteLine(res);
+
         }
         bool CheckCellString(string filepath, string oldTxt, string newTxt)
         {
