@@ -23,6 +23,7 @@ namespace ExcelTextReplacer
         int counter = 0;
         string oldTxt = "Барышева";
         string newTxt = "!!!";
+        int filesNumber = 0;
 
         BackgroundWorker worker;
 
@@ -152,6 +153,9 @@ namespace ExcelTextReplacer
                 progress.Value = 0;
                 replaceBtn.Content = "Отмена";
 
+                worker.ProgressChanged += worker_ProgressChanged;
+                worker.RunWorkerCompleted += worker_RunWorkerCompleted;
+
                 worker.RunWorkerAsync();
             }
             else
@@ -164,6 +168,9 @@ namespace ExcelTextReplacer
             BackgroundWorker worker = sender as BackgroundWorker;
 
             string[] files = Directory.GetFiles(Environment.CurrentDirectory, "*.xlsx");
+
+            filesNumber = files.Length;
+
             foreach (string file in files)
             {
                 if(worker.CancellationPending == true)
@@ -174,20 +181,30 @@ namespace ExcelTextReplacer
                 else
                 {
                     //ReplaceSymbolsInSharedStringTable(file, oldTxt, newTxt);
-                    Dispatcher.Invoke(() =>
-                    {
-                        progress.Value += 100 / files.Length;
-                        progressText.Text = file;
-                    });
-                    worker.ReportProgress(100 / files.Length);
+                    //Dispatcher.Invoke(() =>
+                    //{
+                    //    progress.Value += 100 / filesNumber;
+                    //    progressText.Text = file;
+                    //});
+                    worker.ReportProgress(100 / filesNumber);
                     Thread.Sleep(500);
                 }
-
-
-
             }            
             MessageBox.Show("Сделано замен: " + counter + "!");
             Dispatcher.Invoke(() => replaceBtn.Content = "Заменить");
+        }
+        void worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            progress.Value += 100 / filesNumber;
+
+            Debug.WriteLine(((BackgroundWorker)sender));
+
+            //progressText.Text = sender;
+        }
+
+        void worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+
         }
     }
 }
