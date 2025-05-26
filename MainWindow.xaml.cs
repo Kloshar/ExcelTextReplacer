@@ -11,6 +11,7 @@ using System.Diagnostics;
 using System.Xml;
 using System.Windows.Controls.Primitives;
 using DocumentFormat.OpenXml.Drawing.Charts;
+using System.ComponentModel;
 //https://learn.microsoft.com/ru-ru/office/open-xml/spreadsheet/overview
 
 namespace ExcelTextReplacer
@@ -141,17 +142,27 @@ namespace ExcelTextReplacer
             oldTxt = replaceWhat.Text;
             newTxt = replaceWith.Text;
 
-            //ReplaceSymbolsInSharedStringTable(path, oldTxt, newTxt);
-
+            progress.Value = 0;
+            BackgroundWorker worker = new BackgroundWorker();
+            worker.DoWork += doWork;
+            worker.RunWorkerAsync(10000);            
+        }
+        void doWork(object sender, DoWorkEventArgs e)
+        {
             string[] files = Directory.GetFiles(Environment.CurrentDirectory, "*.xlsx");
-
             foreach (string file in files)
             {
-                progress.Value += 25;
-                Debug.WriteLine(Path.GetFileName(file));
-                ReplaceSymbolsInSharedStringTable(file, oldTxt, newTxt);
-            }
+                //Debug.WriteLine(System.IO.Path.GetFileName(file));
 
+                //ReplaceSymbolsInSharedStringTable(file, oldTxt, newTxt);
+
+                Dispatcher.Invoke(() =>
+                {
+                    progress.Value += 100/files.Length;
+                    progressText.Text = file;
+                });
+                Thread.Sleep(500);
+            }
             MessageBox.Show("Сделано замен: " + counter + "!");
         }
     }

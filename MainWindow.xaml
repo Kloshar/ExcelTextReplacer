@@ -19,9 +19,7 @@
             <Separator Height="20" Foreground="{x:Null}" Background="White"/>
             <Button x:Name="replaceBtn" Width="100" Click="replaceBtn_Click">Заменить</Button>            
         </StackPanel>
-        <ProgressBar x:Name="progress" Grid.Row="1" >
-            
-        </ProgressBar>       
-
+        <ProgressBar x:Name="progress" Grid.Row="1" />
+        <TextBlock x:Name="progressText" Grid.Row="1" VerticalAlignment="Center" />
     </Grid>
 </Window>
