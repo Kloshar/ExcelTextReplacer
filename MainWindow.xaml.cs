@@ -16,6 +16,14 @@ using System.Diagnostics;
 using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using DocumentFormat.OpenXml.EMMA;
 using System.Xml;
+<<<<<<< HEAD
+=======
+using System.Windows.Controls.Primitives;
+using DocumentFormat.OpenXml.Drawing.Charts;
+using System.ComponentModel;
+
+//https://learn.microsoft.com/ru-ru/office/open-xml/spreadsheet/overview
+>>>>>>> progressBar-Changes
 
 using Text = DocumentFormat.OpenXml.Spreadsheet.Text;
 using Run = DocumentFormat.OpenXml.Spreadsheet.Run;
@@ -174,11 +182,40 @@ namespace ExcelTextReplacer
         {
             bool res = CheckCellString(path, replaceWhat.Text, replaceWith.Text);
 
+<<<<<<< HEAD
             if (res)
             {
                 Debug.WriteLine("Сделано замен: " + counter + "!");
                 //MessageBox.Show("Сделано замен: " + counter + "!");
             }
+=======
+            oldTxt = replaceWhat.Text;
+            newTxt = replaceWith.Text;
+
+            progress.Value = 0;
+            BackgroundWorker worker = new BackgroundWorker();
+            worker.DoWork += doWork;
+            worker.RunWorkerAsync(10000);            
+        }
+        void doWork(object sender, DoWorkEventArgs e)
+        {
+            string[] files = Directory.GetFiles(Environment.CurrentDirectory, "*.xlsx");
+            foreach (string file in files)
+            {
+                //Debug.WriteLine(System.IO.Path.GetFileName(file));
+
+                //ReplaceSymbolsInSharedStringTable(file, oldTxt, newTxt);
+
+                Dispatcher.Invoke(() =>
+                {
+                    progress.Value += 100/files.Length;
+                    progressText.Text = file;
+                });
+                //Thread.Sleep(500);
+
+            }
+            MessageBox.Show("Сделано замен: " + counter + "!");
+>>>>>>> progressBar-Changes
         }
     }
 }

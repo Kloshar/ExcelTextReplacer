@@ -6,11 +6,19 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+<<<<<<< HEAD
     <PackageIcon>excelReplacer01.png</PackageIcon>
   </PropertyGroup>
 
   <ItemGroup>
     <None Remove="excelReplacer01.png" />
+=======
+    <ApplicationIcon>icon\excelReplacer.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="icon\excelReplacer.ico" />
+>>>>>>> progressBar-Changes
   </ItemGroup>
 
   <ItemGroup>
