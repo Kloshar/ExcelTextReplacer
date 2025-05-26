@@ -162,7 +162,8 @@ namespace ExcelTextReplacer
                     progress.Value += 100/files.Length;
                     progressText.Text = file;
                 });
-                Thread.Sleep(500);
+                //Thread.Sleep(500);
+
             }
             MessageBox.Show("Сделано замен: " + counter + "!");
         }
