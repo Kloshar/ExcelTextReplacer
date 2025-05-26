@@ -24,12 +24,19 @@ namespace ExcelTextReplacer
         string oldTxt = "Барышева";
         string newTxt = "!!!";
 
+        BackgroundWorker worker;
+
         public MainWindow()
         {
             InitializeComponent();
 
             replaceWhat.Text = oldTxt;
             replaceWith.Text = newTxt;
+
+            worker = new BackgroundWorker();
+            worker.WorkerReportsProgress = true;
+            worker.WorkerSupportsCancellation = true;
+            worker.DoWork += doWork;
 
             //replaceBtn.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent)); //автоматическое нажатие кнопки начала замены
         }
@@ -137,33 +144,50 @@ namespace ExcelTextReplacer
 
         private void replaceBtn_Click(object sender, RoutedEventArgs e)
         {
-            //File.Copy("bookOld.xlsx", "book.xlsx", true);
+            if (string.Compare((string)replaceBtn.Content, "Заменить") == 0 && worker.IsBusy != true)
+            {
+                //File.Copy("bookOld.xlsx", "book.xlsx", true);
+                oldTxt = replaceWhat.Text;
+                newTxt = replaceWith.Text;
+                progress.Value = 0;
+                replaceBtn.Content = "Отмена";
 
-            oldTxt = replaceWhat.Text;
-            newTxt = replaceWith.Text;
-
-            progress.Value = 0;
-            BackgroundWorker worker = new BackgroundWorker();
-            worker.DoWork += doWork;
-            worker.RunWorkerAsync(10000);
+                worker.RunWorkerAsync();
+            }
+            else
+            {
+                worker.CancelAsync();
+            }
         }
-        void doWork(object sender, DoWorkEventArgs e)
+        void doWork(object? sender, DoWorkEventArgs e)
         {
+            BackgroundWorker worker = sender as BackgroundWorker;
+
             string[] files = Directory.GetFiles(Environment.CurrentDirectory, "*.xlsx");
             foreach (string file in files)
             {
-                //Debug.WriteLine(System.IO.Path.GetFileName(file));
-
-                //ReplaceSymbolsInSharedStringTable(file, oldTxt, newTxt);
-
-                Dispatcher.Invoke(() =>
+                if(worker.CancellationPending == true)
                 {
-                    progress.Value += 100 / files.Length;
-                    progressText.Text = file;
-                });
-                Thread.Sleep(500);
-            }
+                    e.Cancel = true;
+                    break;
+                }
+                else
+                {
+                    //ReplaceSymbolsInSharedStringTable(file, oldTxt, newTxt);
+                    Dispatcher.Invoke(() =>
+                    {
+                        progress.Value += 100 / files.Length;
+                        progressText.Text = file;
+                    });
+                    worker.ReportProgress(100 / files.Length);
+                    Thread.Sleep(500);
+                }
+
+
+
+            }            
             MessageBox.Show("Сделано замен: " + counter + "!");
+            Dispatcher.Invoke(() => replaceBtn.Content = "Заменить");
         }
     }
 }
