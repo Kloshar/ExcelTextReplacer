@@ -180,31 +180,34 @@ namespace ExcelTextReplacer
                 }
                 else
                 {
-                    //ReplaceSymbolsInSharedStringTable(file, oldTxt, newTxt);
-                    //Dispatcher.Invoke(() =>
-                    //{
-                    //    progress.Value += 100 / filesNumber;
-                    //    progressText.Text = file;
-                    //});
-                    worker.ReportProgress(100 / filesNumber);
-                    Thread.Sleep(500);
+                    //ReplaceSymbolsInSharedStringTable(file, oldTxt, newTxt);                    
+                    worker.ReportProgress(100 / filesNumber, file);                    
+                    Thread.Sleep(100);
                 }
-            }            
-            MessageBox.Show("Сделано замен: " + counter + "!");
-            Dispatcher.Invoke(() => replaceBtn.Content = "Заменить");
+            }
         }
         void worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             progress.Value += 100 / filesNumber;
-
-            Debug.WriteLine(((BackgroundWorker)sender));
-
-            //progressText.Text = sender;
+            progressText.Text = e.UserState.ToString();
         }
 
         void worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            if(e.Cancelled == true)
+            {
 
+            }
+            else if(e.Error != null)
+            {
+
+            }
+            else
+            {
+                progress.Value = 100;
+                MessageBox.Show("Сделано замен: " + counter + "!");
+                replaceBtn.Content = "Заменить";
+            }
         }
     }
 }
