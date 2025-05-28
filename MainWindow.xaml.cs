@@ -12,6 +12,7 @@ using System.Xml;
 using System.Windows.Controls.Primitives;
 using DocumentFormat.OpenXml.Drawing.Charts;
 using System.ComponentModel;
+using System.Collections.ObjectModel;
 //https://learn.microsoft.com/ru-ru/office/open-xml/spreadsheet/overview
 
 namespace ExcelTextReplacer
@@ -21,20 +22,40 @@ namespace ExcelTextReplacer
         string path = @"book.xlsx";
         //string path = @"93-24-2030_РКМ_Койда_1_безопасность.xlsx";
         int counter = 0;
-        string oldTxt = "Барышева";
-        string newTxt = "!!!";
+        string oldTxt = "";
+        string newTxt = "";
         int filesNumber = 0;
+        public string[] files;
+        public ObservableCollection<string> names { get; set; }
 
         BackgroundWorker worker;
 
         public MainWindow()
         {
+            files = Directory.GetFiles(Environment.CurrentDirectory, "*.xlsx");
+            names = new ObservableCollection<string>() { "1", "2"};
+            
             InitializeComponent();
+
+            //lstView.ItemsSource = names;
 
             replaceWhat.Text = oldTxt;
             replaceWith.Text = newTxt;
 
+            worker = new BackgroundWorker(); //класс для асинхронного выполнения в отдельном потоке
+            worker.WorkerReportsProgress = true;
+            worker.WorkerSupportsCancellation = true;
+            worker.DoWork += doWork;
+            worker.ProgressChanged += worker_ProgressChanged;
+            worker.RunWorkerCompleted += worker_RunWorkerCompleted;
+
             //replaceBtn.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent)); //автоматическое нажатие кнопки начала замены
+        }
+
+        string[] makeFilesList(string path)
+        {
+            string[] files = Directory.GetFiles(Environment.CurrentDirectory, "*.xlsx");
+            return files;
         }
         void ReplaceSymbolsInSharedStringTable(string filepath, string oldTxt, string newTxt)
         {
@@ -136,26 +157,16 @@ namespace ExcelTextReplacer
                 MessageBox.Show(ex.Message);
             }
         }
-
-        private void replaceBtn_Click(object sender, RoutedEventArgs e)
+        void replaceBtn_Click(object sender, RoutedEventArgs e)
         {
             //File.Copy("bookOld.xlsx", "book.xlsx", true);
             oldTxt = replaceWhat.Text;
             newTxt = replaceWith.Text;
             progress.Value = 0;
 
-            worker = new BackgroundWorker();
-            worker.WorkerReportsProgress = true;
-            worker.WorkerSupportsCancellation = true;
-            worker.DoWork += doWork;
-
             if (string.Compare((string)replaceBtn.Content, "Заменить") == 0 && worker.IsBusy != true)
             {
                 replaceBtn.Content = "Отмена";
-
-                worker.ProgressChanged += worker_ProgressChanged;
-                worker.RunWorkerCompleted += worker_RunWorkerCompleted;
-
                 worker.RunWorkerAsync();
             }
             else
@@ -167,13 +178,11 @@ namespace ExcelTextReplacer
         {
             BackgroundWorker? worker = sender as BackgroundWorker;
 
-            string[] files = Directory.GetFiles(Environment.CurrentDirectory, "*.xlsx");
-
             filesNumber = files.Length;
 
             foreach (string file in files)
             {
-                Debug.WriteLine($"worker.CancellationPending = {worker.CancellationPending}");
+                //Debug.WriteLine($"worker.CancellationPending = {worker.CancellationPending}");
 
                 if (worker.CancellationPending == true)
                 {                    
@@ -193,7 +202,6 @@ namespace ExcelTextReplacer
             progress.Value += 100 / filesNumber;
             progressText.Text = e.UserState.ToString();
         }
-
         void worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             Debug.WriteLine("In worker_RunWorkerCompleted...");
@@ -211,7 +219,8 @@ namespace ExcelTextReplacer
                 MessageBox.Show("Сделано замен: " + counter + "!");
             }
             replaceBtn.Content = "Заменить";
-        }
+            progressText.Text = "";
 
+        }
     }
 }

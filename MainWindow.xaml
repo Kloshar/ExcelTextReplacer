@@ -7,10 +7,7 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800" Icon="/excelReplacer01.png">
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="159*"/>
-            <ColumnDefinition Width="41*"/>
-        </Grid.ColumnDefinitions>
+
         <Grid.RowDefinitions>
             <RowDefinition />
             <RowDefinition Height="30"/>
@@ -22,6 +19,13 @@
             <TextBox x:Name="replaceWith" TextWrapping="Wrap" AcceptsReturn="True" Height="50"/>
             <Separator Height="20" Foreground="{x:Null}" Background="White"/>
             <Button x:Name="replaceBtn" Width="100" Click="replaceBtn_Click">Заменить</Button>
+            <ListView x:Name="lstView" ItemsSource="{Binding names}" Height="100">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn/>
+                    </GridView>
+                </ListView.View>
+            </ListView>
         </StackPanel>
         <ProgressBar x:Name="progress" Grid.Row="1" Grid.ColumnSpan="2" />
         <TextBlock x:Name="progressText" Grid.Row="1" VerticalAlignment="Center" Grid.ColumnSpan="2" />
