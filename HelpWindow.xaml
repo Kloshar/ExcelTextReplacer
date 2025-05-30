@@ -1,0 +1,45 @@
+﻿<Window x:Name="HelpWindow1" x:Class="ExcelTextReplacer.HelpWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ExcelTextReplacer"
+        mc:Ignorable="d"
+        Title="HelpWindow" Height="450" Width="800">
+    <Grid>
+        <RichTextBox x:Name="docBox" Margin="5,10,5,10" >
+            <FlowDocument>
+                <Paragraph TextAlignment="Center">
+                    <Bold>Справка</Bold>
+                </Paragraph>
+                <Paragraph>
+                    Утилита предназначена для пакетной замены текста в нескольких файлах Excel в формате xlsx.
+                </Paragraph>
+                <Paragraph>
+                    Использование:
+                </Paragraph>
+                <Paragraph>
+                    1. Перед использованием рекомендуется сделать бэкап всех файлов excel, с которыми предполагается работать. Изменения вносимые программой необратимы и результат может не соответствовать ожиданиям.
+                </Paragraph>
+                <Paragraph>
+                    2. Добавить файлы с помощью кнопки "Добавить". Файлы в папке с программой добавляются автоматически.
+                </Paragraph>
+                <Paragraph>
+                    3. Заполнить поля с текстом для поиска и замены.
+                </Paragraph>
+                <Paragraph>
+                    4. Нажать кнопку "Заменить" для запуска программы.
+                </Paragraph>
+                <Paragraph>
+                    Утилита распространяется бесплатно.
+                </Paragraph>
+                <Paragraph>
+                    Предложения по улучшению и вопросы по работе программы вы можете отправить на электронную почту: Kloshar13@yahoo.com
+                </Paragraph>
+                <Paragraph>
+                    Автор: Башмаков Илья
+                </Paragraph>
+            </FlowDocument>
+        </RichTextBox>
+    </Grid>
+</Window>

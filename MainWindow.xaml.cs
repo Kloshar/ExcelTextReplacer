@@ -15,6 +15,7 @@ using System.ComponentModel;
 using System.Collections.ObjectModel;
 using Microsoft.Win32;
 using System.Collections.Specialized;
+
 //https://learn.microsoft.com/ru-ru/office/open-xml/spreadsheet/overview
 
 namespace ExcelTextReplacer
@@ -35,22 +36,19 @@ namespace ExcelTextReplacer
     }
     public partial class MainWindow : Window
     {
-        string path = @"book.xlsx";
-        //string path = @"93-24-2030_РКМ_Койда_1_безопасность.xlsx";
+        //string path = @"book.xlsx";
         int counter = 0;
         string oldTxt = "";
         string newTxt = "";
-        int filesNumber = 0;
-        string[] filesInCurrentFolder;
-        public ObservableCollection<fileObject> files { get; set; } //свойство класса MainWindow. В нём располагается коллекция объектов типа 'fileObject'
-
+        int filesNumber = 0;      
         BackgroundWorker worker;
+        public ObservableCollection<fileObject> files { get; set; } //свойство класса MainWindow. В нём располагается коллекция объектов типа 'fileObject'
 
         public MainWindow()
         {
             files = new ObservableCollection<fileObject>(); //коллекция, посылающая уведомления об изменении
 
-            filesInCurrentFolder = Directory.GetFiles(Environment.CurrentDirectory, "*.xlsx");
+            string[] filesInCurrentFolder = Directory.GetFiles(Environment.CurrentDirectory, "*.xlsx");
             foreach (string f in filesInCurrentFolder) files.Add(new fileObject(f));
 
             InitializeComponent();
@@ -70,7 +68,6 @@ namespace ExcelTextReplacer
 
             //replaceBtn.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent)); //автоматическое нажатие кнопки начала замены
         }
-
         string[] makeFilesList(string path)
         {
             string[] files = Directory.GetFiles(Environment.CurrentDirectory, "*.xlsx");
@@ -210,7 +207,7 @@ namespace ExcelTextReplacer
                 }
                 else
                 {
-                    //ReplaceSymbolsInSharedStringTable(file.path, oldTxt, newTxt);
+                    ReplaceSymbolsInSharedStringTable(file.FullPath, oldTxt, newTxt);
                     worker.ReportProgress(100 / filesNumber, file);                    
                     Thread.Sleep(500);
                 }
@@ -241,11 +238,11 @@ namespace ExcelTextReplacer
             progressText.Text = "";
 
         }
-
         void addFileBtn_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog dia = new OpenFileDialog();
             dia.Multiselect = true;
+            dia.Filter = "Excel document | *.xlsx";
             if(dia.ShowDialog() == true)
             {
                 foreach (string f in dia.FileNames) files.Add(new fileObject(f));
@@ -253,11 +250,18 @@ namespace ExcelTextReplacer
         }
         void removeFileBtn_Click(object sender, RoutedEventArgs e)
         {
-            foreach (var s in lstView.SelectedItems) Debug.WriteLine(s);
-
-            Debug.WriteLine($"{lstView.SelectedItems}");
-
-
+            fileObject[] selected = new fileObject[lstView.SelectedItems.Count];
+            lstView.SelectedItems.CopyTo(selected, 0);
+            foreach (fileObject s in selected) files.Remove(s);            
+        }
+        private void userWindow_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.F1) 
+            {
+                Debug.WriteLine($"{e.Key}");
+                HelpWindow hp = new HelpWindow();
+                hp.Show();
+            }
         }
     }
 }
