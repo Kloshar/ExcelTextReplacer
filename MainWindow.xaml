@@ -7,27 +7,27 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800" Icon="/excelReplacer01.png">
     <Grid>
-
         <Grid.RowDefinitions>
+            <RowDefinition Height="233"/>
             <RowDefinition />
             <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
         </Grid.RowDefinitions>
-        <StackPanel Orientation="Vertical" Grid.ColumnSpan="2" Margin="0,0,0,30" Grid.RowSpan="2">
+        <StackPanel Grid.Row="0" Orientation="Vertical" Margin="5">
             <Label>Что заменить</Label>
             <TextBox x:Name="replaceWhat" TextWrapping="Wrap" AcceptsReturn="True" Height="50"/>
             <Label>Чем заменить</Label>
             <TextBox x:Name="replaceWith" TextWrapping="Wrap" AcceptsReturn="True" Height="50"/>
             <Separator Height="20" Foreground="{x:Null}" Background="White"/>
             <Button x:Name="replaceBtn" Width="100" Click="replaceBtn_Click">Заменить</Button>
-            <ListView x:Name="lstView" ItemsSource="{Binding names}" Height="100">
-                <ListView.View>
-                    <GridView>
-                        <GridViewColumn/>
-                    </GridView>
-                </ListView.View>
-            </ListView>
-        </StackPanel>
-        <ProgressBar x:Name="progress" Grid.Row="1" Grid.ColumnSpan="2" />
-        <TextBlock x:Name="progressText" Grid.Row="1" VerticalAlignment="Center" Grid.ColumnSpan="2" />
+            <Label>Список файлов</Label>
+        </StackPanel>        
+        <ListView x:Name="lstView" Grid.Row="1" ItemsSource="{Binding files}" ScrollViewer.CanContentScroll="True" />
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
+            <Button x:Name="addFileBtn"  Width="100" Height="20" Click="addFileBtn_Click">Добавить</Button>
+            <Button x:Name="removeFileBtn" Width="100" Height="20" Click="removeFileBtn_Click" ScrollViewer.CanContentScroll="True">Удалить</Button>
+        </StackPanel>        
+        <ProgressBar x:Name="progress" Grid.Row="3" Grid.ColumnSpan="2" />
+        <TextBlock x:Name="progressText" Grid.Row="3" VerticalAlignment="Center" Grid.ColumnSpan="2" />
     </Grid>
 </Window>

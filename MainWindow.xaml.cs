@@ -13,10 +13,26 @@ using System.Windows.Controls.Primitives;
 using DocumentFormat.OpenXml.Drawing.Charts;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
+using Microsoft.Win32;
+using System.Collections.Specialized;
 //https://learn.microsoft.com/ru-ru/office/open-xml/spreadsheet/overview
 
 namespace ExcelTextReplacer
 {
+    public class fileObject //класс для получения имени файлов
+    {
+        public fileObject(string filePath) //конструктор
+        {
+            FullPath = filePath; //устанавливаем свойство
+            Name = Path.GetFileName(filePath); //устанавливаем свойство
+        }
+        public string FullPath { get; set; } //свойство FullPath
+        public string Name { get; } //свойство Name
+        public override string ToString() //переопределяем, чтобы можно было отобразить имя в списке
+        {
+            return Name;
+        }
+    }
     public partial class MainWindow : Window
     {
         string path = @"book.xlsx";
@@ -25,19 +41,22 @@ namespace ExcelTextReplacer
         string oldTxt = "";
         string newTxt = "";
         int filesNumber = 0;
-        public string[] files;
-        public ObservableCollection<string> names { get; set; }
+        string[] filesInCurrentFolder;
+        public ObservableCollection<fileObject> files { get; set; } //свойство класса MainWindow. В нём располагается коллекция объектов типа 'fileObject'
 
         BackgroundWorker worker;
 
         public MainWindow()
         {
-            files = Directory.GetFiles(Environment.CurrentDirectory, "*.xlsx");
-            names = new ObservableCollection<string>() { "1", "2"};
-            
-            InitializeComponent();
+            files = new ObservableCollection<fileObject>(); //коллекция, посылающая уведомления об изменении
 
-            //lstView.ItemsSource = names;
+            filesInCurrentFolder = Directory.GetFiles(Environment.CurrentDirectory, "*.xlsx");
+            foreach (string f in filesInCurrentFolder) files.Add(new fileObject(f));
+
+            InitializeComponent();
+            DataContext = this;
+
+            //files.CollectionChanged += (object? sender, NotifyCollectionChangedEventArgs e) => Debug.WriteLine($"Коллекция изменилась: {e.Action}");
 
             replaceWhat.Text = oldTxt;
             replaceWith.Text = newTxt;
@@ -178,9 +197,9 @@ namespace ExcelTextReplacer
         {
             BackgroundWorker? worker = sender as BackgroundWorker;
 
-            filesNumber = files.Length;
+            filesNumber = files.Count;
 
-            foreach (string file in files)
+            foreach (fileObject file in files)
             {
                 //Debug.WriteLine($"worker.CancellationPending = {worker.CancellationPending}");
 
@@ -191,7 +210,7 @@ namespace ExcelTextReplacer
                 }
                 else
                 {
-                    //ReplaceSymbolsInSharedStringTable(file, oldTxt, newTxt);                    
+                    //ReplaceSymbolsInSharedStringTable(file.path, oldTxt, newTxt);
                     worker.ReportProgress(100 / filesNumber, file);                    
                     Thread.Sleep(500);
                 }
@@ -220,6 +239,24 @@ namespace ExcelTextReplacer
             }
             replaceBtn.Content = "Заменить";
             progressText.Text = "";
+
+        }
+
+        void addFileBtn_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog dia = new OpenFileDialog();
+            dia.Multiselect = true;
+            if(dia.ShowDialog() == true)
+            {
+                foreach (string f in dia.FileNames) files.Add(new fileObject(f));
+            }
+        }
+        void removeFileBtn_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (var s in lstView.SelectedItems) Debug.WriteLine(s);
+
+            Debug.WriteLine($"{lstView.SelectedItems}");
+
 
         }
     }
