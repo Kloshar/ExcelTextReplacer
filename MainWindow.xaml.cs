@@ -254,14 +254,18 @@ namespace ExcelTextReplacer
             lstView.SelectedItems.CopyTo(selected, 0);
             foreach (fileObject s in selected) files.Remove(s);            
         }
-        private void userWindow_KeyUp(object sender, KeyEventArgs e)
+        void userWindow_KeyUp(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.F1) 
-            {
-                Debug.WriteLine($"{e.Key}");
-                HelpWindow hp = new HelpWindow();
-                hp.Show();
-            }
+            if (e.Key == Key.F1) showHeplWindow();
+        }
+        void openHelpWindow(object sender, RoutedEventArgs e)
+        {
+            showHeplWindow();
+        }
+        void showHeplWindow()
+        {
+            HelpWindow hp = new HelpWindow();
+            hp.Show();
         }
     }
 }
