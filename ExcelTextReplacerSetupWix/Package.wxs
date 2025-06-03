@@ -1,0 +1,76 @@
+﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
+	
+	<Package Name="ExcelTextReplacer" Language="1033" Codepage="1251" Version="2.0" Manufacturer="Kloshar" UpgradeCode="80F797B1-A372-4530-B94A-4A232A0F2D5B" InstallerVersion="200">
+
+		<SummaryInformation Manufacturer="Kloshar"  />
+
+		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+
+		<MediaTemplate EmbedCab="yes" />
+
+		<Feature Id="ProductFeature" Title="ExcelTextReplacerSetupWix3" Level="1">
+
+			<ComponentGroupRef Id="ProductComponents" />
+			<ComponentRef Id="CMP_ExcelTextReplacer_files" />
+			<ComponentRef Id="CMP_Shortcut" />
+
+		</Feature>
+
+		<Icon Id="icon.ico" SourceFile="excelReplacer.ico" />
+
+		<Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+
+		<ui:WixUI Id="WixUI_InstallDir" />
+		<WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
+
+	</Package>
+	
+	<Fragment>
+		
+		<!--Создаём папку в Program files-->
+
+		<!--Добавляем ярлыки программы и удаления в папку меню Пуск-->
+		<DirectoryRef Id="SHORTCUTFOLDER">
+			<Component Id="CMP_Shortcut" Guid="41AEA57B-5306-4868-86B3-6B6F1A550866">
+
+				<Shortcut Id="StartMenuShortcut" Name="ExcelTextReplacer" Description="Пакетная замена в Excel" Target="[ProgramFiles64Folder]\ExcelTextReplacer\ExcelTextReplacer.exe" Icon="icon.ico" />
+
+				<Shortcut Id="UninstallShortcut" Name="Uninstall ExcelTextReplacer" Description="Удаление ExcelTextReplacer" Target="[System64Folder]msiexec.exe" Arguments="/x [ProductCode]" />
+
+				<RemoveFolder Id="REMOVESHORTCUTFOLDER" On="uninstall" />
+
+				<RegistryValue Root="HKCU" Key="Software\ExcelTextReplacer" Name="installed" Type="integer" Value="1" KeyPath="yes" />
+			</Component>
+		</DirectoryRef>
+
+		<!--Переходим в Program files-->
+		<StandardDirectory Id="ProgramFiles64Folder">
+			<Directory Id="INSTALLFOLDER" Name="ExcelTextReplacer" />
+		</StandardDirectory>
+
+		<!--Создаём папку в меню Пуск-->
+		<StandardDirectory Id="ProgramMenuFolder">
+			<Directory Id="SHORTCUTFOLDER" Name="ExcelTextReplacer" />
+		</StandardDirectory>
+
+	</Fragment>
+
+	<Fragment>
+		<ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+
+			<!--Делаем созданные папки компонентов программы установки-->
+			<Component Id="CMP_ExcelTextReplacer_files" Guid="A18BC6F4-A3C1-477C-9B36-745220971B51" Bitness="always64">
+
+				<!--Создаём исполнительный файл в папке-->
+				<File Id="FILE_ExcelTextReplacer.exe" Source="e:\Programming\_MyProgramms\ExcelTextReplacer\bin\Debug\net8.0-windows\ExcelTextReplacer.exe" KeyPath="yes" />
+				<File Id="FILE_ExcelTextReplacer.dll" Source="e:\Programming\_MyProgramms\ExcelTextReplacer\bin\Debug\net8.0-windows\ExcelTextReplacer.dll" />
+				<File Id="FILE_System.IO.Packaging.dll" Source="e:\Programming\_MyProgramms\ExcelTextReplacer\bin\Debug\net8.0-windows\System.IO.Packaging.dll" />
+				<File Id="FILE_DocumentFormat.OpenXml.dll" Source="e:\Programming\_MyProgramms\ExcelTextReplacer\bin\Debug\net8.0-windows\DocumentFormat.OpenXml.dll" />
+				<File Id="FILE_DocumentFormat.OpenXml.Framework.dll" Source="e:\Programming\_MyProgramms\ExcelTextReplacer\bin\Debug\net8.0-windows\DocumentFormat.OpenXml.Framework.dll" />
+				<File Id="FILE_ExcelTextReplacer.deps.json" Source="e:\Programming\_MyProgramms\ExcelTextReplacer\bin\Debug\net8.0-windows\ExcelTextReplacer.deps.json" />
+				<File Id="FILE_ExcelTextReplacer.runtimeconfig.json" Source="e:\Programming\_MyProgramms\ExcelTextReplacer\bin\Debug\net8.0-windows\ExcelTextReplacer.runtimeconfig.json" />
+
+			</Component>
+		</ComponentGroup>
+	</Fragment>
+</Wix>
